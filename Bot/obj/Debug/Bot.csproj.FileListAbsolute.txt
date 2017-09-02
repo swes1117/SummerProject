@@ -39,3 +39,4 @@ C:\Users\Owner\Source\Repos\Combination\Bot\bin\ru\Microsoft.Bot.Builder.resourc
 C:\Users\Owner\Source\Repos\Combination\Bot\bin\zh-hans\Microsoft.Bot.Builder.resources.dll
 C:\Users\Owner\Source\Repos\Combination\Bot\obj\Debug\Bot Application.dll
 C:\Users\Owner\Source\Repos\Combination\Bot\obj\Debug\Bot Application.pdb
+C:\Users\Owner\Source\Repos\Combination\Bot\bin\AdaptiveCards.dll

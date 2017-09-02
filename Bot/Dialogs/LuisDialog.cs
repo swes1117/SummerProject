@@ -1,4 +1,5 @@
-﻿using Microsoft.Bot.Builder.Dialogs;
+﻿using AdaptiveCards;
+using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Builder.Luis;
 using Microsoft.Bot.Builder.Luis.Models;
 using Microsoft.Bot.Connector;
@@ -14,7 +15,8 @@ namespace Bot.Dialogs
     [Serializable]
     public class LuisDialog : LuisDialog<object>
     {
-        [LuisIntent("Card")]
+        //問問題時或哈囉時觸發
+        [LuisIntent("Help")]
         public async Task Card(IDialogContext context, LuisResult result)
         {
             var reply = context.MakeMessage();
@@ -35,22 +37,14 @@ namespace Bot.Dialogs
                 Images = images,
                 Tap = ca
             };
-            ThumbnailCard tc1 = new ThumbnailCard()
-            {
-                Title = "Need help?",
-                Subtitle = "Go to our main site support.",
-                Images = images,
-                Tap = ca
-            };
-            
-            reply.Attachments.Add(tc.ToAttachment());
-            reply.Attachments.Add(tc1.ToAttachment());
+
+            reply.Attachments.Add(tc.ToAttachment());          
             await context.PostAsync(reply);
             context.Wait(MessageReceived);
 
         }
-
-        [LuisIntent("TeamCount")]
+        
+        [LuisIntent("TeamCount2")]
         public async Task SayHi(IDialogContext context, LuisResult result)
         {
             var time = DateTime.Now.ToString("HH:mm:ss tt");
@@ -62,9 +56,9 @@ namespace Bot.Dialogs
             Options.Add("輸入追朔碼");
             Options.Add("上傳QR code");
             Options.Add("去產銷履歷網站");
-            PromptOptions<string> Selections = new PromptOptions<string>("請選擇三個其中一個", "請再選一次", "最後一次", Options, 2);
+            PromptOptions<string> Selections = new PromptOptions<string>("請選擇兩個其中一個", "請再選一次", "最後一次", Options, 2);
             PromptDialog.Choice<string>(context, ChooseSlection, Selections);
-            //context.Wait(MessageReceived);
+            
         }
         public async Task ChooseSlection(IDialogContext context, IAwaitable<string> result)
         {
@@ -84,8 +78,8 @@ namespace Bot.Dialogs
             }
             context.Wait(MessageReceived);
         }
-
-
+        
+        //按按鈕觸發
         [LuisIntent("Select")]
 
         public async Task reply(IDialogContext context, LuisResult result)
@@ -104,6 +98,8 @@ namespace Bot.Dialogs
                 await context.PostAsync($"2");
             }
             context.Wait(MessageReceived);
+
+
         }
 
         [LuisIntent("")]
@@ -134,12 +130,13 @@ namespace Bot.Dialogs
             {
                 Title = "Vegetable",
                 Images = images,
-                Tap = cafirst
+                Tap = cafirst,
+               
             };
 
             reply.Attachments.Add(tcfirst.ToAttachment());
 
-
+           
 
             var Card = new List<CardAction>();
             var Thumbnail = new List<ThumbnailCard>();
@@ -154,16 +151,83 @@ namespace Bot.Dialogs
                 ThumbnailCard tc = new ThumbnailCard()
                 {
                     Title = "line"+i.ToString(),
-                    Subtitle = arr1[i]+ System.Environment.NewLine+ System.Environment.NewLine + "ascascaadasd" + System.Environment.NewLine + System.Environment.NewLine+"zxasdsaddsaddsadc",
+                    Subtitle = "          "+arr1[i]+  "      ascascaadasd"+"    zxasdsaddsaddsadc",
                     //Images = images,
                     Tap = ca
                 };
 
                 reply.Attachments.Add(tc.ToAttachment());
             }
-
+             await context.PostAsync(reply);
+           
+            context.Wait(MessageReceived);
+        }
+        
+        [LuisIntent("TeamCount")]
+        public async Task test(IDialogContext context,LuisResult result)
+        {
+            var reply = context.MakeMessage();
+            reply.Attachments = new List<Attachment>();
+            AdaptiveCard card = CreateShowCard("You are Idiot");
+            
+            var attachment = new Attachment()
+            {
+                Content = card,
+                ContentType = "application/vnd.microsoft.card.adaptive",
+                Name = "Good"
+            };
+            reply.Attachments.Add(attachment);
             await context.PostAsync(reply);
             context.Wait(MessageReceived);
         }
+
+
+
+
+        public static AdaptiveCard CreateShowCard(String textOutside)
+
+        {
+            var card = new AdaptiveCard();
+            var container = new Container
+            {
+                Items = new List<CardElement>
+                {    
+                    new TextBlock
+                    {
+                        Text = "食品履歷",
+                    }
+                }
+            };
+            card.Body.Add(container);
+            //子卡片按完想看更多才會產生
+            var subCard = new AdaptiveCard();
+            /*
+            subCard.Body.Add(
+             new TextInput
+             {    
+                Id = "Comment",
+                IsMultiline = true,
+                Placeholder = "test",
+            });*/
+            subCard.Body.Add(
+            new TextBlock
+            {
+                Text = textOutside,
+            }
+            );
+            card.Actions = new List<ActionBase>()
+            {
+
+            new ShowCardAction
+            {
+            Title = "了解更多",
+            Card = subCard,
+            }
+
+         };
+            return card;
+        }
+
+    
     }
 }
